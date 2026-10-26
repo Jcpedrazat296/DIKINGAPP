@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Di-King | Caja de Pago</title>
+    <link rel="stylesheet" href="stylee-pago.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-layout" style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+        <div class="panel" id="contenedor-pago" style="max-width: 500px; width: 100%; padding: 20px; box-sizing: border-box;">
+            <div class="logo" style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 24px; color: #5d2a7a; text-align: center; margin-bottom: 10px;">Di-King <span style="color: #ffc107;">Pago Express</span></div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Ingresa tus datos para liquidar tu cuenta.</p>
+
+            <div id="form-pago">
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px;">Número de Placa</label>
+                    <input type="text" id="pago-placa" placeholder="ABC123" style="text-transform: uppercase; width: 100%; padding: 10px; box-sizing: border-box;">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px;">Cédula del Propietario</label>
+                    <input type="number" id="pago-cedula" placeholder="10203040" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                </div>
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 5px;">Correo Electrónico Registrado</label>
+                    <input type="email" id="pago-correo" placeholder="ejemplo@correo.com" style="width: 100%; padding: 10px; box-sizing: border-box;">
+                    <small style="color: #888; font-size: 12px; display: block; margin-top: 5px;">Introduce el correo con el que te registraste para aplicar al 10% de descuento VIP automáticamente.</small>
+                </div>
+
+                <button onclick="procesarLiquidacion()" class="btn-confirmar" style="width: 100%; padding: 12px; background: #5d2a7a; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">Calcular Total</button>
+            </div>
+
+            <div id="resumen-pago" style="display: none; margin-top: 20px; text-align: center;">
+                <hr style="border: 1px dashed #ccc; margin-bottom: 15px;">
+                <div id="detalle-liquidacion" style="font-family: 'Open Sans', sans-serif; line-height: 1.6;"></div>
+                <button onclick="finalizarTransaccion()" class="btn-confirmar" style="background:#28a745; margin-top: 15px; width: 100%; padding: 12px; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px;">Pagar Ahora</button>
+            </div>
+
+            <div id="mensaje-gracias" style="display: none; text-align: center;">
+                <h1 style="color:#28a745; font-size: 48px; margin-bottom: 10px;">✔</h1>
+                <h3>¡Gracias por su pago!</h3>
+                <p style="color: #555;">Su salida ha sido autorizada. Tiene 10 minutos para retirar el vehículo.</p>
+                <a href="index.html" class="back-link" style="display: inline-block; margin-top: 15px; color: #5d2a7a; font-weight: bold; text-decoration: none;">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN DE RED LOCAL CENTRAL: Cambia 'localhost' por tu IP si haces pruebas desde celulares
+        const API_SERVER_IP = '172.20.10.4';
+        const API_VEHICULOS_URL = `http://${API_SERVER_IP}:3000/api/vehiculos`;
+        const API_LOGIN_URL = `http://${API_SERVER_IP}:3000/api/usuarios/login`;
+
+        let placaGlobal = '';
+
+        // 1. PROCESAR LIQUIDACIÓN Y EVALUAR DESCUENTO VIP CONTRA MYSQL
+        async function procesarLiquidacion() {
+            const placa = document.getElementById('pago-placa').value.trim().toUpperCase();
+            const cedula = document.getElementById('pago-cedula').value.trim();
+            const correo = document.getElementById('pago-correo').value.trim();
+
+            if (!placa || !cedula) {
+                alert("Por favor introduce la placa y la cédula del vehículo.");
+                return;
+            }
+
+            try {
+                // Paso A: Consultar si el carro está físicamente dentro del parqueadero activo
+                const resVehiculos = await fetch(API_VEHICULOS_URL);
+                const vehiculosActivos = await resVehiculos.json();
+
+                const vehiculo = vehiculosActivos.find(v => v.placa === placa && String(v.cedula) === cedula);
+
+                if (!vehiculo) {
+                    alert("Error: No se encontró un vehículo activo con esa placa y cédula en nuestras instalaciones.");
+                    return;
+                }
+
+                placaGlobal = vehiculo.placa;
+
+                // Paso B: Verificar si el correo corresponde a un usuario registrado en el sistema
+                let esVIP = false;
+                if (correo !== "") {
+                    try {
+                        // Hacemos una validación rápida contra el endpoint de login del backend
+                        // Si la cuenta existe, el backend responderá de manera exitosa (status 200)
+                        const resUsuario = await fetch(API_LOGIN_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ correo: correo, contrasena: "" }) 
+                        });
+                        
+                        // Si el backend responde ok o si determinamos que es un usuario registrado en la app
+                        if (resUsuario.status !== 404) {
+                            esVIP = true;
+                        }
+                    } catch (e) {
+                        console.log("No se pudo verificar el estado VIP, se procesará como tarifa normal.");
+                    }
+                }
+
+                // Paso C: Efectuar cálculos matemáticos de estancia en tiempo real
+                const horaEntrada = new Date(vehiculo.hora_entrada);
+                const ahora = new Date();
+                
+                // Calcular minutos transcurridos (mínimo 1 minuto de cobro)
+                const minutos = Math.max(1, Math.ceil((ahora - horaEntrada) / 60000));
+                
+                let subtotal = minutos * 100; // Tarifa base ejemplo: $100 por minuto
+                let descuento = esVIP ? (subtotal * 0.10) : 0;
+                let total = subtotal - descuento;
+
+                // Renderizar la información en la caja de resultados
+                document.getElementById('form-pago').style.display = 'none';
+                document.getElementById('resumen-pago').style.display = 'block';
+                
+                document.getElementById('detalle-liquidacion').innerHTML = `
+                    <p style="margin: 8px 0;">Vehículo Placa: <strong>${vehiculo.placa}</strong></p>
+                    <p style="margin: 8px 0;">Tiempo de estancia: <strong>${minutos} min</strong></p>
+                    <p style="margin: 8px 0;">Subtotal: <strong>$${subtotal}</strong></p>
+                    ${esVIP ? `<p style="color:#28a745; margin: 8px 0;">✨ Descuento Usuario Registrado (10%): <strong>-$${descuento}</strong></p>` : ''}
+                    <h2 style="color:#5d2a7a; margin-top: 15px;">Total a Pagar: $${total}</h2>
+                `;
+
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                alert("Error al conectar con la base de datos central de Di-King.");
+            }
+        }
+
+        // 2. CONFIRMAR PAGO Y REMOVER EL VEHÍCULO DE MYSQL
+        async function finalizarTransaccion() {
+            try {
+                // Consumimos el método DELETE del backend para liberar el cupo en la tabla vehiculos_activos
+                const respuesta = await fetch(`${API_VEHICULOS_URL}/${placaGlobal}`, {
+                    method: 'DELETE'
+                });
+
+                if (respuesta.ok) {
+                    // Ocultar resumen y pintar caja de salida exitosa
+                    document.getElementById('resumen-pago').style.display = 'none';
+                    document.getElementById('mensaje-gracias').style.display = 'block';
+                } else {
+                    alert("Hubo un problema al autorizar tu salida en el servidor principal.");
+                }
+            } catch (error) {
+                console.error("Error al procesar el pago:", error);
+                alert("Error en la transacción. Verifica tu conexión de red.");
+            }
+        }
+    </script>
+</body>
+</html>

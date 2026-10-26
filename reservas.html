@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DI-KING - Reservar Celda Express</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(rgba(26, 26, 46, 0.85), rgba(93, 42, 122, 0.85)), 
+                        url('https://park365.com.co/wp-content/uploads/2024/11/Diseno-sin-titulo-2-1-1095x460-1-1024x430.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container-reserva {
+            background: #ffffff;
+            color: #333333;
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .logo-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #5d2a7a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .logo-section p {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 6px;
+            outline: none;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #5d2a7a;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f4f4f6;
+            color: #777777;
+            border-color: #e1e1e1;
+            cursor: not-allowed;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .btn-reservar {
+            width: 100%;
+            background-color: #5d2a7a;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(93, 42, 122, 0.3);
+        }
+
+        .btn-reservar:hover {
+            background-color: #431d59;
+            transform: translateY(-2px);
+        }
+
+        .btn-reservar:disabled {
+            background-color: #a58cb6;
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 25px;
+            text-decoration: none;
+            color: #666666;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #5d2a7a;
+        }
+
+        @media (max-width: 480px) {
+            .container-reserva { padding: 30px 20px; }
+            .logo-section h2 { font-size: 24px; }
+            .form-row { flex-direction: column; gap: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-reserva">
+        <div class="logo-section">
+            <h2>DI-KING</h2>
+            <p>Agendar Reserva de Celda Express</p>
+        </div>
+
+        <form id="formReserva">
+            <div class="form-group">
+                <label for="correoUsuario">Correo Electrónico Autenticado:</label>
+                <input type="email" id="correoUsuario" readonly required placeholder="Cargando sesión...">
+            </div>
+
+            <div class="form-group">
+                <label for="ubicacionReserva">Seleccione la Ubicación / Sede:</label>
+                <select id="ubicacionReserva" required>
+                    <option value="" disabled selected>-- Selecciona un parqueadero --</option>
+                    <option value="Sede Central - Calle 45 #12-30">Sede Central - Calle 45</option>
+                    <option value="Sede Norte - Av. El Dorado #68-10">Sede Norte - Av. El Dorado</option>
+                    <option value="Sede Centro - Cra 7 #18-45">Sede Centro - Carrera 7ma</option>
+                    <option value="Sede Centro Comercial Mall Plaza">Sede Mall Plaza (Zona VIP)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="placaVehiculo">Placa del Vehículo:</label>
+                <input type="text" id="placaVehiculo" placeholder="Ej: ABC123" maxlength="6" required style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group">
+                <label for="cedulaUsuario">Número de Cédula:</label>
+                <input type="number" id="cedulaUsuario" placeholder="Ej: 1023456789" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fechaReserva">Fecha de Llegada:</label>
+                    <input type="date" id="fechaReserva" required>
+                </div>
+                <div class="form-group">
+                    <label for="horaReserva">Hora Estimada:</label>
+                    <input type="time" id="horaReserva" required>
+                </div>
+            </div>
+
+            <button type="submit" id="btnConfirmar" class="btn-reservar">Confirmar Reserva 📅</button>
+        </form>
+
+        <a href="login.html" onclick="cerrarSesion()" class="back-link">← Cerrar Sesión / Volver</a>
+    </div>
+
+    <script>
+        const SERVER_IP = '172.20.10.4'; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lectura de los datos persistentes del usuario autenticado
+            let correoGuardado = sessionStorage.getItem("usuario_correo") || localStorage.getItem("usuario_correo");
+            const accesoConcedido = sessionStorage.getItem("acceso_concedido") === "true" || localStorage.getItem("acceso_concedido") === "true";
+            
+            // Intenta extraer el correo si fue almacenado como objeto JSON en el localStorage
+            if (!correoGuardado) {
+                try {
+                    const userObj = JSON.parse(localStorage.getItem('usuario')) || JSON.parse(sessionStorage.getItem('usuario'));
+                    if (userObj && userObj.correo) correoGuardado = userObj.correo;
+                } catch(e) {}
+            }
+
+            // Si no hay correo autenticado válido en la memoria del navegador, deniega el acceso e invita a loguearse
+            if (!accesoConcedido || !correoGuardado) {
+                alert('Acceso denegado: Por favor inicia sesión con tu usuario registrado para realizar una reserva.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Asigna el correo real registrado en la BD al campo de lectura
+            document.getElementById('correoUsuario').value = correoGuardado;
+
+            // Establece la fecha mínima de selección al día actual
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fechaReserva').min = hoy;
+        });
+
+        function cerrarSesion() {
+            sessionStorage.clear();
+            localStorage.clear();
+        }
+
+        document.getElementById('formReserva').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnConfirmar');
+            const correo_usuario = document.getElementById('correoUsuario').value.trim();
+            const ubicacion = document.getElementById('ubicacionReserva').value;
+            const placa = document.getElementById('placaVehiculo').value.trim().toUpperCase();
+            const cedula = document.getElementById('cedulaUsuario').value.trim();
+            const fecha = document.getElementById('fechaReserva').value;
+            const hora = document.getElementById('horaReserva').value;
+
+            if (!correo_usuario) {
+                alert('Error de sesión: No se identificó el correo del usuario registrado.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Generando QR de Acceso...';
+
+            try {
+                const respuesta = await fetch(`http://${SERVER_IP}:3000/api/vehiculos/reservas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        placa,
+                        cedula,
+                        correo_usuario,
+                        ubicacion,
+                        fecha_reserva: fecha,
+                        hora_reserva_usuario: hora
+                    })
+                });
+
+                const resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    alert('¡Reserva registrada con éxito! Revisa tu correo electrónico para visualizar tu pase de entrada y salida con código QR.');
+                    document.getElementById('formReserva').reset();
+                    document.getElementById('correoUsuario').value = correo_usuario;
+                } else {
+                    alert(`Error en Reserva: ${resultado.error}`);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+                alert('No se pudo conectar con el servidor central de DI-KING.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Confirmar Reserva 📅';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Di-King | Registro</title>
+    <link rel="stylesheet" href="style-login.css"> 
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo">Di-King</div>
+            <h2>Crear Cuenta</h2>
+            <form id="register-form">
+                <div class="input-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="reg-name" required>
+                </div>
+                <div class="input-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="reg-email" required>
+                </div>
+                <div class="input-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="reg-pass" required>
+                </div>
+                <button type="submit" class="login-btn">Registrarse</button>
+            </form>
+            <p style="margin-top:15px; font-size:14px; color:#666;">
+                ¿Ya tienes cuenta? <a href="login.html" style="color:#5d2a7a">Inicia sesión aquí</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const API_IP = '172.20.10.4'; 
+        const REGISTRO_URL = `http://${API_IP}:3000/api/usuarios/registro`;
+
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('reg-name').value.trim();
+            const correo = document.getElementById('reg-email').value.trim();
+            const contrasena = document.getElementById('reg-pass').value;
+
+            try {
+                const respuesta = await fetch(REGISTRO_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, correo, contrasena })
+                });
+
+                const resultado = await respuesta.json();
+
+                if (respuesta.ok) {
+                    // Si el backend responde 201 (Created), guardó en MySQL y disparó el Email exitosamente
+                    alert("¡Registro exitoso! Revisa tu correo electrónico. Ahora puedes iniciar sesión.");
+                    window.location.href = "login.html";
+                } else {
+                    // Atrapamos los errores controlados del backend (como duplicados de correo)
+                    alert(`Error: ${resultado.error}`);
+                }
+
+            } catch (error) {
+                console.error("Error de conexión:", error);
+                alert("No se pudo conectar con el servidor central de Di-King. Verifica tu conexión de red.");
+            }
+        });
+    </script>
+</body>
+</html>

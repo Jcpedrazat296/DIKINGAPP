@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #f1f3f6;
+    padding-bottom: 30px;
+}
+
+.grid-operativo {
+    display: grid;
+    grid-template-columns: 1fr; /* Una sola columna en celulares */
+    gap: 15px;
+    padding: 15px;
+}
+
+/* En tablets y PCs se expande a 2 o 3 columnas */
+@media (min-width: 768px) {
+    .grid-operativo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 1024px) {
+    .grid-operativo {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.card-operacion {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.full-width {
+    grid-column: 1 / -1; /* Ocupa todo el ancho disponible */
+    margin: 0 15px;
+}
+
+/* ==========================================
+   PROTECCIÓN RESPONSIVA PARA TABLAS (MÓVIL)
+   ========================================== */
+.table-scroll {
+    width: 100%;
+    overflow-x: auto; /* Permite arrastrar de lado a lado en celulares */
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px; /* Asegura que los datos no se aplasten horrendamente */
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+}
+
+th {
+    background: #f8f9fa;
+    color: #5d2a7a;
+    font-weight: bold;
+}
+
+/* BOTONES DE ACCIÓN */
+.btn-accion {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-ingreso { background: #5d2a7a; color: white; }
+.btn-cobro { background: #ffc107; color: #333; }

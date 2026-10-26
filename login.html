@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Di-King | Iniciar Sesión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; }
+        body { background: #f4f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .login-card {
+            background: #ffffff; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid #5d2a7a;
+        }
+        .login-card h2 { color: #5d2a7a; font-family: 'Montserrat', sans-serif; font-weight: 900; text-align: center; margin-bottom: 20px; }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #333; }
+        .input-group input { width: 100%; padding: 10px; border: 2px solid #e1e1e1; border-radius: 6px; outline: none; }
+        .input-group input:focus { border-color: #5d2a7a; }
+        
+        .btn-submit {
+            width: 100%; background: #5d2a7a; color: white; border: none; padding: 12px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #4a2162; }
+        .btn-submit:disabled { background: #a58cb6; cursor: not-allowed; }
+        
+        .link-olvido {
+            display: block; text-align: center; margin-top: 15px; font-size: 13px;
+            color: #5d2a7a; text-decoration: none; font-weight: 600; cursor: pointer;
+        }
+        .link-olvido:hover { text-decoration: underline; }
+
+        /* Estilo de Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+            justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 10px; width: 90%; max-width: 380px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2); position: relative;
+        }
+        .modal-content h3 { color: #5d2a7a; font-family: 'Montserrat', sans-serif; margin-bottom: 15px; }
+        .btn-cancelar { background: #6c757d; margin-top: 8px; }
+        .btn-cancelar:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2>DI-KING LOGIN</h2>
+        <form id="form-login" onsubmit="procesarLogin(event)">
+            <div class="input-group">
+                <label>Correo Electrónico</label>
+                <input type="email" id="login-correo" required placeholder="correo@ejemplo.com">
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" id="login-pass" required placeholder="••••••••">
+            </div>
+            <button type="submit" id="btn-login" class="btn-submit">Iniciar Sesión</button>
+        </form>
+        
+        <a onclick="abrirModalOlvido()" class="link-olvido">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <!-- MODAL SOLICITAR ENLACE DE RECUPERACIÓN -->
+    <div id="modal-olvido" class="modal-overlay">
+        <div class="modal-content">
+            <h3>🔑 Recuperar Contraseña</h3>
+            <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Ingresa tu correo registrado y te enviaremos un enlace de restablecimiento.</p>
+            <form onsubmit="enviarCorreoRecuperacion(event)">
+                <div class="input-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="recuperar-correo" required placeholder="correo@ejemplo.com">
+                </div>
+                <button type="submit" id="btn-enviar-correo" class="btn-submit">Enviar Enlace</button>
+                <button type="button" onclick="cerrarModalOlvido()" class="btn-submit btn-cancelar">Volver</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_IP = '172.20.10.4'; 
+        const BASE_API_URL = `http://${SERVER_IP}:3000/api/usuarios`;
+
+        async function procesarLogin(e) {
+            e.preventDefault();
+            const correo = document.getElementById('login-correo').value.trim();
+            const contrasena = document.getElementById('login-pass').value.trim();
+            const btn = document.getElementById('btn-login');
+
+            btn.disabled = true;
+            btn.innerText = "Verificando...";
+
+            try {
+                const res = await fetch(`${BASE_API_URL}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ correo, contrasena })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    sessionStorage.setItem("acceso_concedido", "true");
+                    sessionStorage.setItem("usuario_nombre", data.usuario.nombre);
+                    sessionStorage.setItem("usuario_correo", data.usuario.correo); // <--- OBLIGATORIO GUARDA EL CORREO REAL
+
+                    alert(`¡Bienvenido ${data.usuario.nombre}!`);
+                    window.location.href = data.usuario.tipo === 'Admin' ? "gestion.html" : "reservas.html";
+                }
+            } catch (err) {
+                alert("Error de conexión con el servidor. Revisa que Node.js esté activo.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Iniciar Sesión";
+            }
+        }
+
+        function abrirModalOlvido() { document.getElementById('modal-olvido').style.display = 'flex'; }
+        function cerrarModalOlvido() { document.getElementById('modal-olvido').style.display = 'none'; }
+
+        async function enviarCorreoRecuperacion(e) {
+            e.preventDefault();
+            const correo = document.getElementById('recuperar-correo').value.trim();
+            const btn = document.getElementById('btn-enviar-correo');
+
+            if (!correo) return alert("Ingresa un correo válido.");
+
+            btn.disabled = true;
+            btn.innerText = "Enviando correo...";
+
+            try {
+                const res = await fetch(`${BASE_API_URL}/olvido-contrasena`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ correo })
+                });
+                const data = await res.json();
+                alert(data.message);
+                cerrarModalOlvido();
+            } catch (err) {
+                alert("Error de red al enviar la solicitud.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Enviar Enlace";
+            }
+        }
+    </script>
+</body>
+</html>

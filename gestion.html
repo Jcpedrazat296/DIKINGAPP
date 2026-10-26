@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Di-King | Software de Gestión v2.0</title>
+    <link rel="stylesheet" href="style-gestion.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           MEJORAS ESTÉTICAS Y DE INTERFAZ (DI-KING)
+           ========================================== */
+        
+        /* Modal Overlay estilizada con desenfoque de fondo */
+        .modal-overlay {
+            display: none; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(26, 26, 46, 0.7); 
+            backdrop-filter: blur(4px);
+            justify-content: center; align-items: center;
+            z-index: 2000;
+            transition: all 0.3s ease;
+        }
+
+        /* Caja del recibo emulando un ticket moderno */
+        .recibo-box {
+            background: #ffffff; 
+            padding: 30px; 
+            border-radius: 12px; 
+            width: 90%; 
+            max-width: 420px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border-top: 8px solid #5d2a7a;
+            position: relative;
+        }
+
+        /* Ticket de pago simulado */
+        .ticket-efecto {
+            background-color: #f8f9fa;
+            border: 1px dashed #bbb;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            color: #333;
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        /* Botones del Panel Optimizados */
+        .btn-ingresar-reserva {
+            background-color: #28a745; color: white; border: none; padding: 5px 10px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;
+            transition: background 0.2s;
+        }
+        .btn-ingresar-reserva:hover { background-color: #218838; }
+
+        .btn-cobrar-tabla {
+            background: #e0a800; color: #fff; border: none; padding: 5px 10px; 
+            border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;
+            transition: background 0.2s;
+        }
+        .btn-cobrar-tabla:hover { background-color: #d39e00; }
+
+        .btn-modal-finalizar {
+            background: #28a745; color: white; border: none; padding: 10px 16px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-modal-finalizar:hover { background-color: #218838; }
+
+        .btn-modal-cancelar {
+            background: #6c757d; color: white; border: none; padding: 10px 16px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;
+            transition: background 0.2s;
+        }
+        .btn-modal-cancelar:hover { background-color: #5a6268; }
+    </style>
+    <script>
+        // SEGURIDAD CENTRAL: Si la sesión no es válida, bloquea el render de la página
+        if (sessionStorage.getItem("acceso_concedido") !== "true") {
+            alert("Acceso denegado. Por favor inicie sesión como Administrador.");
+            window.location.href = "login.html"; 
+        }
+    </script>
+</head>
+<body>
+
+    <nav class="admin-nav" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background-color: #5d2a7a; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div class="logo" style="color:white; font-family:'Montserrat', sans-serif; font-weight:900; font-size:20px; letter-spacing:1px;">DI-KING <span style="color:#ffc107; font-weight:700;">ADMIN</span></div>
+        <a href="#" onclick="cerrarSesionAdmin()" class="btn-volver" style="color:white; text-decoration:none; font-weight:bold; font-size:14px; background:rgba(255,255,255,0.1); padding:6px 12px; border-radius:4px;">❌ Cerrar Sesión</a>
+    </nav>
+
+    <main class="gestion-container">
+        <header class="header-interno">
+            <h1>SISTEMA DE CONTROL DE PARQUEADERO</h1>
+            <p id="fecha-actual" style="font-weight: 600; color: #666;"></p>
+        </header>
+
+        <div class="grid-operativo">
+            <section class="card-operacion">
+                <h2><span class="icon">📥</span> Registro de Ingreso Manual</h2>
+                <div class="input-group">
+                    <label>Número de Placa</label>
+                    <input type="text" id="reg-placa" placeholder="ABC123" style="text-transform: uppercase;">
+                </div>
+                <div class="input-group">
+                    <label>Cédula del Propietario</label>
+                    <input type="number" id="reg-cedula" placeholder="10203040">
+                </div>
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label>Sede / Sitio Actual</label>
+                    <select id="reg-ubicacion" style="width:100%; padding:10px; border-radius:6px; border:2px solid #e1e1e1; outline:none;">
+                        <option value="Sede Central - Calle 45 #12-30">Sede Central - Calle 45</option>
+                        <option value="Sede Norte - Av. El Dorado #68-10">Sede Norte - Av. El Dorado</option>
+                        <option value="Sede Centro - Cra 7 #18-45">Sede Centro - Carrera 7ma</option>
+                        <option value="Sede Centro Comercial Mall Plaza">Sede Mall Plaza (Zona VIP)</option>
+                    </select>
+                </div>
+                <button onclick="registrarEntradaManual()" class="btn-accion btn-ingreso">Registrar Vehículo</button>
+            </section>
+
+            <section class="card-operacion">
+                <h2><span class="icon">📤</span> Salida y Cobro Express</h2>
+                <div class="input-group">
+                    <label>Buscar por Placa</label>
+                    <input type="text" id="out-placa" placeholder="Ingrese placa a retirar" style="text-transform: uppercase; font-weight: bold; letter-spacing: 1px;">
+                </div>
+                <button onclick="abrirCajaCobro()" class="btn-accion btn-cobro" style="background-color: #ffc107; color: #1a1a2e; font-weight: bold;">🧮 Calcular Tarifa y Cobrar</button>
+            </section>
+
+            <section class="card-operacion">
+                <h2><span class="icon">📅</span> Reservas para el Día</h2>
+                <p class="subtitle">Solicitudes desde el sitio web</p>
+                <div class="table-scroll small-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Placa</th>
+                                <th>Ubicación Sede</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-reservas-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <section class="card-operacion full-width">
+            <div class="titulo-flex" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h2>Vehículos en el Parqueadero</h2>
+                <span id="cupos-info" class="badge" style="background:#5d2a7a; color:white; padding:6px 12px; border-radius:4px; font-weight: bold;">Cupos ocupados: 0</span>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Placa</th>
+                            <th>Cédula</th>
+                            <th>Hora Ingreso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-vehiculos-body">
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-recibo" class="modal-overlay">
+        <div class="recibo-box">
+            <h3 style="color:#5d2a7a; font-family:'Montserrat', sans-serif; font-weight:900; margin-bottom:5px; text-align: center;">🧾 RECIBO DE PAGO</h3>
+            <p style="font-size: 12px; color: #666; text-align: center; margin-bottom: 15px;">DI-KING Sistema de Parqueaderos</p>
+            
+            <div id="detalle-recibo" class="ticket-efecto"></div>
+            
+            <div class="modal-footer" style="display:flex; gap:10px; justify-content: center; margin-top: 20px;">
+                <button onclick="confirmarSalidaYLiberarMySQL()" class="btn-modal-finalizar">💸 Confirmar Pago</button>
+                <button onclick="cerrarRecibo()" class="btn-modal-cancelar">Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_IP = '172.20.10.4'; 
+        const BASE_API_URL = `http://${SERVER_IP}:3000/api/vehiculos`;
+
+        let listaVehiculosInternos = [];
+        let placaSeleccionadaParaCobro = '';
+
+        document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-ES', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        window.onload = function() {
+            cargarVehiculosActivos();
+            cargarReservasPendientes();
+        };
+
+        async function cargarVehiculosActivos() {
+            try {
+                const res = await fetch(BASE_API_URL);
+                listaVehiculosInternos = await res.json();
+                
+                const tbody = document.getElementById('lista-vehiculos-body');
+                tbody.innerHTML = '';
+                document.getElementById('cupos-info').innerText = `Cupos ocupados: ${listaVehiculosInternos.length}`;
+
+                listaVehiculosInternos.forEach((car, index) => {
+                    const horaFormateada = new Date(car.hora_entrada).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td style="font-weight:bold; color:#5d2a7a; font-size: 15px; letter-spacing:0.5px;">${car.placa}</td>
+                            <td>${car.cedula}</td>
+                            <td>${horaFormateada}</td>
+                            <td>
+                                <button class="btn-cobrar-tabla" onclick="forzarSalidaDirecta('${car.placa}')">Cobrar 💵</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Error cargando vehículos activos:", err);
+            }
+        }
+
+        async function cargarReservasPendientes() {
+            try {
+                const res = await fetch(`${BASE_API_URL}/reservas`);
+                const reservas = await res.json();
+                
+                const tbody = document.getElementById('lista-reservas-body');
+                tbody.innerHTML = '';
+
+                if(reservas.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" style="color:#999; text-align:center; padding: 15px;">No hay reservas hoy</td></tr>`;
+                    return;
+                }
+
+                reservas.forEach(reserva => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight:bold; color:green;">${reserva.placa}</td>
+                            <td style="font-size:11px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${reserva.ubicacion || 'Sede General'}</td>
+                            <td>
+                                <button class="btn-ingresar-reserva" onclick="aprobarIngresoReserva('${reserva.placa}', '${reserva.cedula}')">Ingresar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error("Error cargando reservas:", err);
+            }
+        }
+
+        async function registrarEntradaManual() {
+            const placa = document.getElementById('reg-placa').value.trim().toUpperCase();
+            const cedula = document.getElementById('reg-cedula').value.trim();
+            const ubicacion = document.getElementById('reg-ubicacion').value;
+
+            if(!placa || !cedula) return alert("Por favor ingresa placa y cédula.");
+
+            try {
+                const res = await fetch(BASE_API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ placa, cedula, ubicacion })
+                });
+                const data = await res.json();
+
+                if(res.ok) {
+                    alert("Vehículo ingresado con éxito.");
+                    document.getElementById('reg-placa').value = '';
+                    document.getElementById('reg-cedula').value = '';
+                    cargarVehiculosActivos();
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) {
+                alert("Error al conectar con el servidor.");
+            }
+        }
+
+        async function aprobarIngresoReserva(placa, cedula) {
+            try {
+                const resIngreso = await fetch(BASE_API_URL, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ placa, cedula, tipo_usuario: 'Reserva Web' })
+                });
+
+                if(resIngreso.ok) {
+                    await fetch(`${BASE_API_URL}/reservas/${placa}`, { method: 'DELETE' });
+                    alert(`¡Reserva validada! El vehículo ${placa} ingresó al parqueadero.`);
+                    cargarVehiculosActivos();
+                    cargarReservasPendientes();
+                } else {
+                    const errorData = await resIngreso.json();
+                    alert(`Error al procesar reserva: ${errorData.error}`);
+                }
+            } catch (err) {
+                alert("Error de procesamiento de red.");
+            }
+        }
+
+        function abrirCajaCobro() {
+            const placa = document.getElementById('out-placa').value.trim().toUpperCase();
+            if(!placa) return alert("Escribe una placa para calcular.");
+            forzarSalidaDirecta(placa);
+        }
+
+        /* LÓGICA DE COBRO COMPLETAMENTE REPARADA Y MEJORADA */
+        function forzarSalidaDirecta(placa) {
+            const vehiculo = listaVehiculosInternos.find(v => v.placa === placa.toUpperCase());
+            if(!vehiculo) return alert("La placa no se encuentra dentro del parqueadero activo.");
+
+            // CORRECCIÓN CLAVE: Se cambió 'v.placa' por 'vehiculo.placa' para remover el bloqueo de ejecución.
+            placaSeleccionadaParaCobro = vehiculo.placa;
+            const horaEntrada = new Date(vehiculo.hora_entrada);
+            const horaSalida = new Date();
+            
+            const diferenciaMinutos = Math.max(1, Math.ceil((horaSalida - horaEntrada) / (1000 * 60)));
+            const TARIFA_POR_MINUTO = 100; // Ajusta el costo por minuto aquí
+            const totalCobro = diferenciaMinutos * TARIFA_POR_MINUTO;
+
+            // Formateo del ticket estilo caja registradora
+            const detalleHTML = `
+                <div style="text-align: center; border-bottom: 1px dashed #333; padding-bottom: 8px; margin-bottom: 8px;">
+                    <strong>DI-KING CONTROL</strong>
+                </div>
+                <p><strong>PLACA:</strong> ${vehiculo.placa}</p>
+                <p><strong>CÉDULA:</strong> ${vehiculo.cedula}</p>
+                <p><strong>INGRESO:</strong> ${horaEntrada.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                <p><strong>SALIDA:</strong> ${horaSalida.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                <p><strong>TIEMPO TOTAL:</strong> ${diferenciaMinutos} min</p>
+                <div style="border-top: 1px dashed #333; margin-top: 8px; padding-top: 8px; font-size: 16px; font-weight: bold; text-align: center; color: #5d2a7a;">
+                    TOTAL: $${totalCobro.toLocaleString('es-CO')} COP
+                </div>
+            `;
+
+            document.getElementById('detalle-recibo').innerHTML = detalleHTML;
+            document.getElementById('modal-recibo').style.display = 'flex';
+        }
+
+        function cerrarRecibo() {
+            document.getElementById('modal-recibo').style.display = 'none';
+        }
+
+        async function confirmarSalidaYLiberarMySQL() {
+            try {
+                const res = await fetch(`${BASE_API_URL}/${placaSeleccionadaParaCobro}`, {
+                    method: 'DELETE'
+                });
+
+                if(res.ok) {
+                    alert(`Pago registrado. Cupo liberado con éxito para la placa ${placaSeleccionadaParaCobro}.`);
+                    document.getElementById('out-placa').value = '';
+                    cerrarRecibo();
+                    cargarVehiculosActivos();
+                } else {
+                    alert("No se pudo procesar la salida en el servidor.");
+                }
+            } catch(err) {
+                alert("Error de conexión al liberar el cupo.");
+            }
+        }
+
+        function cerrarSesionAdmin() {
+            sessionStorage.clear();
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

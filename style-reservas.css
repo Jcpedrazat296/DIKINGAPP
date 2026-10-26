@@ -1,0 +1,47 @@
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+
+.dashboard { display: flex; height: 100vh; }
+
+/* Mapa */
+.map-container { flex: 1.5; background: #e9ecef; position: relative; padding: 20px; }
+header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.user-badge { background: #5d2a7a; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+.logout { color: #5d2a7a; text-decoration: none; font-size: 14px; }
+
+.map-placeholder { 
+    height: 80%; background: #ddd; border-radius: 15px; 
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 2px dashed #aaa;
+}
+
+.marker { 
+    background: white; padding: 10px 20px; border-radius: 30px; margin: 10px;
+    cursor: pointer; transition: 0.3s; border: 1px solid #5d2a7a; font-weight: bold;
+}
+.marker:hover { background: #5d2a7a; color: white; transform: scale(1.1); }
+
+/* Formulario */
+.form-container { flex: 1; padding: 40px; background: white; border-left: 1px solid #eee; overflow-y: auto; }
+h2 { font-family: 'Montserrat'; margin-bottom: 30px; }
+label { display: block; margin: 15px 0 5px; font-weight: 600; font-size: 14px; }
+input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; }
+.row { display: flex; gap: 10px; }
+.btn-reserva { 
+    width: 100%; padding: 15px; background: #5d2a7a; color: white; 
+    border: none; border-radius: 8px; margin-top: 30px; cursor: pointer; font-weight: bold;
+}
+
+/* Modal */
+.modal { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; 
+}
+.modal-content { 
+    background: white; padding: 40px; border-radius: 15px; text-align: center; max-width: 400px;
+    animation: popIn 0.3s ease-out;
+}
+.icon-check { 
+    width: 60px; height: 60px; background: #28a745; color: white; 
+    border-radius: 50%; font-size: 30px; line-height: 60px; margin: 0 auto 20px; 
+}
+@keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }

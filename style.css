@@ -1,0 +1,284 @@
+/* ==========================================
+   ESTILOS BASE UNIVERSALES
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+    background-color: #ffffff;
+    overflow-x: hidden; /* Evita cualquier scroll horizontal accidental en móviles */
+}
+
+/* ==========================================
+   HEADER / MENÚ DE NAVEGACIÓN RESPONSIVO
+   ========================================== */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: 0.3s;
+}
+
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: #5d2a7a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    margin: 0 15px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+nav ul li a:hover {
+    color: #5d2a7a;
+}
+
+.actions .btn-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: 20px;
+    transition: color 0.2s;
+}
+
+.actions .btn-link:hover {
+    color: #5d2a7a;
+}
+
+/* ==========================================
+   HERO SECTION (ADAPTACIÓN DE TEXTOS DE PC)
+   ========================================== */
+.hero {
+    height: 100vh;
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), 
+                url('https://park365.com.co/wp-content/uploads/2024/11/Diseno-sin-titulo-2-1-1095x460-1-1024x430.jpg'); 
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    padding-left: 10%;
+    padding-right: 5%;
+}
+
+.hero-content {
+    max-width: 700px;
+}
+
+.hero-content h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 80px; /* Tamaño maestro para pantallas grandes */
+    line-height: 1.05;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    font-weight: 900;
+    text-shadow: 2px 2px 15px rgba(0,0,0,0.4);
+}
+
+.hero-content p {
+    font-size: 18px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 10px rgba(0,0,0,0.6);
+}
+
+/* ==========================================
+   SECCIÓN DE ALIADOS (TARJETAS DINÁMICAS)
+   ========================================== */
+.aliados-section {
+    padding: 80px 5%;
+    background-color: #fff;
+    text-align: center;
+}
+
+.aliados-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 40px;
+    font-weight: 900;
+    color: #1a1a2e;
+    margin-bottom: 10px;
+}
+
+.aliados-header p {
+    color: #666;
+    margin-bottom: 50px;
+    font-size: 18px;
+}
+
+.aliados-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    height: 600px; /* Mantiene la consistencia de altura original */
+}
+
+.aliado-card {
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px; /* Un poco más curvo para look moderno/móvil */
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.aliado-card:hover {
+    transform: translateY(-5px); /* Efecto de elevación refinado */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(transparent 40%, rgba(0,0,0,0.85));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 30px;
+    text-align: left;
+}
+
+.brand-logo {
+    width: 80px;
+    margin-bottom: 15px;
+    filter: brightness(0) invert(1);
+}
+
+.cine-logo {
+    color: white;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    margin-bottom: 15px;
+}
+
+.aliado-info h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+/* ==========================================
+   MEDIA QUERIES: OPTIMIZACIÓN MÓVIL ESTRICTA
+   ========================================== */
+
+/* Ajustes para Tablets y Laptops Pequeñas */
+@media (max-width: 1024px) {
+    .hero-content h1 {
+        font-size: 55px; /* Reducción intermedia */
+    }
+    header {
+        padding: 20px 30px;
+    }
+}
+
+/* Ajustes Críticos para Celulares (Smartphones) */
+@media (max-width: 768px) {
+    /* 1. Header apilado fluidamente para que no se desborde */
+    header {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px 10px;
+        position: relative; /* Evita tapar contenido inicial en pantallas muy chicas */
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px 0;
+    }
+
+    nav ul li a {
+        margin: 0 10px;
+        font-size: 13px;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .actions .btn-link {
+        margin: 0 10px;
+        font-size: 13px;
+    }
+
+    /* 2. Escala drástica del Hero para evitar desbordamientos */
+    .hero {
+        height: calc(100vh - 120px); /* Resta el espacio del header apilado */
+        padding-left: 20px;
+        padding-right: 20px;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-content h1 {
+        font-size: 34px; /* Evita que las palabras largas se corten en la pantalla del celular */
+        margin-bottom: 15px;
+    }
+
+    .hero-content p {
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    /* 3. Reestructuración del Grid de Aliados */
+    .aliados-header h2 {
+        font-size: 28px;
+    }
+
+    .aliados-header p {
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+    .aliados-grid {
+        height: auto; /* Permite que el contenedor crezca según sus hijos */
+        grid-template-columns: 1fr; /* Una sola columna vertical limpia */
+        gap: 20px;
+    }
+
+    .aliado-card {
+        height: 350px; /* Altura perfecta para deslizar con el dedo en pantallas verticales */
+    }
+    
+    .overlay {
+        padding: 20px;
+    }
+    
+    .aliado-info h3 {
+        font-size: 22px;
+    }
+}

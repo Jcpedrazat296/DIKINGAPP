@@ -1,0 +1,132 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #f8f9fa;
+}
+
+/* MENÚ SUPERIOR ADAPTATIVO */
+.public-nav {
+    background: #5d2a7a;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+/* DISEÑO DE DISEÑO DE PANELES (GRID A FLEX REVERSAL) */
+.main-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column; /* Apilados por defecto en celular */
+    gap: 20px;
+}
+
+/* En computadoras grandes se ponen de lado a lado automáticamente */
+@media (min-width: 768px) {
+    .main-layout {
+        flex-direction: row;
+    }
+    .panel {
+        flex: 1;
+    }
+}
+
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.botones-ciudades {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+/* Botones gigantes para el pulgar del usuario */
+.btn-ciudad {
+    flex: 1;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #5d2a7a;
+    background: transparent;
+    color: #5d2a7a;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-ciudad:focus, .btn-ciudad:active {
+    background: #5d2a7a;
+    color: white;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px; /* Clave anti-zoom */
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* HORAS LLEGADA Y SALIDA: En celular van separadas, en PC juntas */
+.time-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+@media (min-width: 480px) {
+    .time-container {
+        flex-direction: row;
+    }
+    .time-container .input-group {
+        flex: 1;
+    }
+}
+
+.btn-confirmar {
+    width: 100%;
+    padding: 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}

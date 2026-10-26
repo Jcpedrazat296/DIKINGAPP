@@ -1,0 +1,33 @@
+name: DI-KING CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v3
+
+      - name: Validar sintaxis de Docker Compose
+        run: docker compose config
+
+      - name: Construir y levantar contenedores (Build & Test)
+        run: docker compose up --build -d
+
+      - name: Esperar inicializacion de base de datos y servicios
+        run: sleep 15
+
+      - name: Verificar estado de contenedores
+        run: docker ps
+
+      - name: Validar logs del Backend Node.js
+        run: docker logs diking-api
+
+      - name: Apagar y limpiar entorno
+        run: docker compose down -v

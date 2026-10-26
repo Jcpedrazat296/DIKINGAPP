@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #ede7f6; /* Tono morado muy claro de fondo */
+    padding: 15px;
+}
+
+.main-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 90vh;
+}
+
+.panel {
+    background: white;
+    padding: 30px 20px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(93, 42, 122, 0.15);
+}
+
+/* Mejoras en campos de texto para inputs táctiles */
+input[type="text"], input[type="number"], input[type="email"] {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px; /* Clave maestra anti zoom en móviles */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: #fbfbfd;
+}
+
+input:focus {
+    border-color: #5d2a7a;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(93,42,122,0.1);
+}

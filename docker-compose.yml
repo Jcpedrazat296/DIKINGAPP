@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  diking-db:
+    image: mysql:8.0
+    container_name: diking-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "12345"
+      MYSQL_DATABASE: "diking_db"
+    ports:
+      - "3306:3306"
+    volumes:
+      - diking_mysql_data:/var/lib/mysql
+      - ./diking_db.sql:/docker-entrypoint-initdb.d/diking_db.sql
+    networks:
+      - diking-network
+
+  diking-api:
+    build: .
+    container_name: diking-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=diking-db
+    depends_on:
+      - diking-db
+    networks:
+      - diking-network
+
+volumes:
+  diking_mysql_data:
+
+networks:
+  diking-network:
+    driver: bridge

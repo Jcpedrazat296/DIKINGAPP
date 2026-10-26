@@ -1,0 +1,133 @@
+/* ==========================================
+   ESTILOS BASE UNIVERSALES
+   ========================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 15px; /* Evita que la tarjeta toque los bordes del celular */
+}
+
+.login-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    background: #ffffff;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 420px; /* Tamaño perfecto en PC y Laptop */
+}
+
+.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    color: #5d2a7a;
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.logo span {
+    color: #ffc107;
+}
+
+h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* ==========================================
+   FORMULARIOS Y ELEMENTOS TÁCTILES (MÓVIL)
+   ========================================== */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+/* Inputs grandes, fáciles de presionar con el dedo */
+.input-group input {
+    width: 100%;
+    padding: 14px; 
+    font-size: 16px; /* Evita que iOS (iPhone) haga zoom automático molesto */
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: #5d2a7a;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background: #5d2a7a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 4px 12px rgba(93, 42, 122, 0.2);
+}
+
+.login-btn:active {
+    transform: scale(0.98); /* Efecto visual al tocar la pantalla */
+}
+
+.back-link {
+    color: #5d2a7a;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+/* ==========================================
+   ADAPTACIÓN ESTRICTA PARA PANTALLAS CHICAS
+   ========================================== */
+@media (max-width: 480px) {
+    .login-box {
+        padding: 25px 15px; /* Menos espacio interno para ganar pantalla */
+        box-shadow: none; /* Quitamos sombra en celular para un look más plano/app */
+        background: transparent; /* Se integra al fondo */
+    }
+    body {
+        background: #ffffff; /* Fondo blanco limpio en móviles */
+    }
+}

@@ -1,0 +1,66 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column; /* Apilado vertical en móvil */
+    min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row; /* Lado a lado en computadoras */
+    }
+    .info-section {
+        width: 40%;
+        overflow-y: auto;
+    }
+    .map-section {
+        width: 60%;
+        height: 100vh;
+    }
+}
+
+.info-section {
+    padding: 20px;
+    background: white;
+}
+
+/* Asegura que el mapa tenga un tamaño decente y no quede aplastado en celular */
+.map-section {
+    width: 100%;
+    height: 350px; 
+    background: #ddd;
+}
+
+@media (min-width: 768px) {
+    .map-section {
+        height: 100vh;
+    }
+}
+
+.input-group {
+    display: flex;
+    margin-top: 8px;
+    margin-bottom: 20px;
+}
+
+.input-group input {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px 0 0 6px;
+}
+
+.input-group button {
+    padding: 0 15px;
+    background: #5d2a7a;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Di-King | Nuestras Ubicaciones</title>
+    <link rel="stylesheet" href="style-parqueaderos.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos rápidos de control para asegurar interactividad visual */
+        .address-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 5px solid #5d2a7a;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .address-item:hover {
+            background: #ede7f6;
+            transform: translateX(5px);
+        }
+        .address-item h3 {
+            margin: 0 0 5px 0;
+            color: #5d2a7a;
+            font-size: 16px;
+        }
+        .address-item p {
+            margin: 0;
+            font-size: 14px;
+            color: #565656;
+        }
+        .no-results {
+            color: #ff4d4d;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <section class="info-section">
+            <a href="index.html" class="back-btn">← Volver al inicio</a>
+            <h1>PARQUEADEROS</h1>
+            <p>Contamos con una red de puntos estratégicos en Colombia, ofreciendo espacios seguros y cómodos para carros, motos y bicicletas con la tecnología de <strong>Di-King</strong>.</p>
+            
+            <div class="search-box">
+                <label for="city-search">Buscar por ciudad</label>
+                <div class="input-group">
+                    <input type="text" id="city-search" placeholder="Introduce una ciudad (ej: Bogotá, Medellín)" onkeyup="evaluarTecla(event)">
+                    <button onclick="buscarCiudad()"><img src="https://cdn-icons-png.flaticon.com/512/54/54481.png" alt="search" width="20"></button>
+                </div>
+            </div>
+
+            <div id="lista-direcciones" class="address-list"></div>
+        </section>
+
+        <section class="map-section">
+            <div id="google-map" style="width: 100%; height: 100%;">
+                <iframe 
+                    id="mapa-interactivo"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d254508.39472391023!2d-74.2482348574421!3d4.648622152862372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9bfd2da6c9eb%3A0x931768f33af9ec5!2sBogot%C3%A1!5e0!3m2!1ses-419!2sco!4v1710000000000" 
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
+                </iframe>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Base de datos local de las sedes reales de Di-King y sus mapas incrustados
+        const baseParqueaderos = [
+            {
+                ciudad: "bogota",
+                nombre: "Di-King Central - Centro Histórico",
+                direccion: "Calle 19 # 4 - 70, Bogotá",
+                mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.9240833113175!2d-74.0722129!3d4.6076211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f99a1cb1c7e23%3A0x444b0e5ee280e2d!2sCl.%2019%2C%20Bogot%C3%A1!5e0!3m2!1ses-419!2sco!4v1710000000001"
+            },
+            {
+                ciudad: "bogota",
+                nombre: "Di-King Norte - Unicentro",
+                direccion: "Carrera 15 # 122 - 30, Bogotá",
+                mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.6119106095033!2d-74.0445722!3d4.7001222!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9ab30164c063%3A0x3344d59a7f3e8f8c!2sUnicentro%20Bogot%C3%A1!5e0!3m2!1ses-419!2sco!4v1710000000002"
+            },
+            {
+                ciudad: "medellin",
+                nombre: "Di-King Poblado - Zona Rosa",
+                direccion: "Carrera 38 # 8 - 45, Medellín",
+                mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.3211516082573!2d-75.5684311!3d6.2213211!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e442831d1eb97bd%3A0x89dc4ea884fb7f0f!2sEl%20Poblado%2C%20Medell%C3%ADn%2C%20Antioquia!5e0!3m2!1ses-419!2sco!4v1710000000003"
+            },
+            {
+                ciudad: "medellin",
+                nombre: "Di-King Laureles",
+                direccion: "Av. Nutibara # 72 - 15, Medellín",
+                mapaUrl: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.123214532101!2d-75.592111!3d6.244321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e4428ff2f5bb467%3A0x7dcdcd984b2efc8f!2sAv.%20Nutibara%2C%20Medell%C3%ADn!5e0!3m2!1ses-419!2sco!4v1710000000004"
+            }
+        ];
+
+        // Carga inicial de todas las sedes disponibles
+        renderizarSedes(baseParqueaderos);
+
+        function renderizarSedes(lista) {
+            const contenedor = document.getElementById('lista-direcciones');
+            contenedor.innerHTML = '';
+
+            if (lista.length === 0) {
+                contenedor.innerHTML = `<p class="no-results">❌ No encontramos sedes en esa ciudad.</p>`;
+                return;
+            }
+
+            lista.forEach(punto => {
+                const item = document.createElement('div');
+                item.className = 'address-item';
+                item.innerHTML = `
+                    <h3>${punto.nombre}</h3>
+                    <p>📍 ${punto.direccion}</p>
+                `;
+                // Al dar clic, muta el mapa interactivo
+                item.onclick = () => actualizarMapa(punto.mapaUrl);
+                contenedor.appendChild(item);
+            });
+        }
+
+        // CONTROL DE BÚSQUEDA Y FILTRADO
+        function buscarCiudad() {
+            const termino = document.getElementById('city-search').value.toLowerCase().trim();
+            
+            // Limpieza de acentos comunes para mejorar coincidencias (bogotá -> bogota)
+            const terminoLimpio = termino.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            if (terminoLimpio === "") {
+                renderizarSedes(baseParqueaderos); // Si está vacío muestra todo
+                return;
+            }
+
+            const filtrados = baseParqueaderos.filter(p => p.ciudad.includes(terminoLimpio));
+            renderizarSedes(filtrados);
+
+            // Si hay resultados, carga automáticamente el mapa del primer elemento del filtro
+            if (filtrados.length > 0) {
+                actualizarMapa(filtrados[0].mapaUrl);
+            }
+        }
+
+        function evaluarTecla(e) {
+            if (e.key === "Enter") buscarCiudad();
+        }
+
+        function actualizarMapa(url) {
+            document.getElementById('mapa-interactivo').src = url;
+        }
+    </script>
+</body>
+</html>

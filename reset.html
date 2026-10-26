@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Di-King | Restablecer Contraseña</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Open Sans', sans-serif; }
+        body { background: #f4f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        .reset-card {
+            background: #ffffff; padding: 40px; border-radius: 12px; width: 100%; max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-top: 6px solid #5d2a7a;
+        }
+        .reset-card h2 { color: #5d2a7a; font-family: 'Montserrat', sans-serif; font-weight: 900; text-align: center; margin-bottom: 15px; }
+        .reset-card p { font-size: 13px; color: #666; text-align: center; margin-bottom: 25px; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: #333; }
+        .input-group input { width: 100%; padding: 12px; border: 2px solid #e1e1e1; border-radius: 6px; outline: none; }
+        .input-group input:focus { border-color: #5d2a7a; }
+        
+        .btn-submit {
+            width: 100%; background: #28a745; color: white; border: none; padding: 12px;
+            border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-submit:hover { background: #218838; }
+        .btn-submit:disabled { background: #82c894; cursor: not-allowed; }
+
+        .btn-voler {
+            display: block; width: 100%; background: #6c757d; color: white; border: none; padding: 10px;
+            border-radius: 6px; font-weight: bold; text-align: center; text-decoration: none; margin-top: 10px;
+        }
+        .btn-voler:hover { background: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <div class="reset-card">
+        <h2>🔒 NUEVA CONTRASEÑA</h2>
+        <p>Ingresa tu nueva clave de acceso para actualizar tu cuenta en DI-KING.</p>
+        
+        <form onsubmit="actualizarContrasena(event)">
+            <div class="input-group">
+                <label>Nueva Contraseña</label>
+                <input type="password" id="nueva-pass" required minlength="4" placeholder="••••••••">
+            </div>
+            <button type="submit" id="btn-actualizar" class="btn-submit">Guardar Contraseña</button>
+            <a href="login.html" class="btn-voler">Cancelar y Volver al Login</a>
+        </form>
+    </div>
+
+    <script>
+        const SERVER_IP = '172.20.10.4'; 
+        const BASE_API_URL = `http://${SERVER_IP}:3000/api/usuarios`;
+
+        let tokenUrl = '';
+
+        // Obtener token desde la URL al cargar
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            tokenUrl = urlParams.get('token');
+
+            if (!tokenUrl) {
+                alert("Enlace no válido o incompleto.");
+                window.location.href = "login.html";
+            }
+        };
+
+        async function actualizarContrasena(e) {
+            e.preventDefault();
+            const nuevaContrasena = document.getElementById('nueva-pass').value.trim();
+            const btn = document.getElementById('btn-actualizar');
+
+            if (!nuevaContrasena || nuevaContrasena.length < 4) {
+                return alert("La contraseña debe tener al menos 4 caracteres.");
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Actualizando en BD...";
+
+            try {
+                const res = await fetch(`${BASE_API_URL}/restablecer-contrasena`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ token: tokenUrl, nuevaContrasena })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert(data.message);
+                    window.location.href = "login.html"; // Redirige al login para iniciar sesión
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) {
+                alert("Error de conexión al intentar actualizar la contraseña.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Guardar Contraseña";
+            }
+        }
+    </script>
+</body>
+</html>
